@@ -20,7 +20,7 @@ export default function Providers({ children }) {
           config={{
             appearance: {
               name: "Hello World",
-              logo: "https://example.com/logo.png",
+              logo: "/favicon.ico",
               mode: "light",
               theme: "base",
             },
