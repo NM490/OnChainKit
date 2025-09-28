@@ -5,6 +5,7 @@ import { cva } from "class-variance-authority";
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import Providers from "@/app/providers";
 
 const Sheet = SheetPrimitive.Root
 
@@ -46,10 +47,12 @@ const sheetVariants = cva(
 
 const SheetContent = React.forwardRef(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-      {children}
-    </SheetPrimitive.Content>
+    <Providers>
+      <SheetOverlay />
+      <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
+        {children}
+      </SheetPrimitive.Content>
+    </Providers>
   </SheetPortal>
 ))
 SheetContent.displayName = SheetPrimitive.Content.displayName
