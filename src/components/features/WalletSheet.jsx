@@ -24,13 +24,14 @@ export default function WalletSheet() {
       debug
     >
       {isConnected && (
-        <Sheet>
-          <SheetTrigger asChild>
+        <Sheet >
+          <SheetTrigger asChild className=" border border-brand bg-white text-brand hover:bg-brand/10 transition dark:border-0 dark:bg-brand/80 dark:text-white"
+>
             <Button
-              className={`font-bold h-full flex justify-center items-center`}
+              className={`h-full font-bold flex justify-center items-center`}
             >
               <FaEthereum size={24} />
-              <EthBalance className={`text-white`} address={address} />
+              <EthBalance className={`text-brand dark:text-white`} address={address} />
             </Button>
           </SheetTrigger>
           <SheetActions />

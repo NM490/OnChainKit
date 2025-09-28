@@ -62,6 +62,21 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    /* Primary variables */
+    --clr-primary-a0: #181A20;
+    --clr-primary-a10: #20232A;
+    --clr-primary-a20: #282C34;
+    --clr-primary-a30: #30343E;
+    --clr-primary-a40: #383C46;
+    --clr-primary-a50: #40444E;
+
+    /* Surface variables */
+    --clr-surface-a0: #1A1C23;
+    --clr-surface-a10: #22242B;
+    --clr-surface-a20: #2A2C33;
+    --clr-surface-a30: #32343B;
+    --clr-surface-a40: #3A3C43;
+    --clr-surface-a50: #42444B;
   }
 
   .dark {
@@ -89,6 +104,21 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    /* Primary variables (dark mode) */
+    --clr-primary-a0: #181A20;
+    --clr-primary-a10: #20232A;
+    --clr-primary-a20: #282C34;
+    --clr-primary-a30: #30343E;
+    --clr-primary-a40: #383C46;
+    --clr-primary-a50: #40444E;
+
+    /* Surface variables (dark mode) */
+    --clr-surface-a0: #1A1C23;
+    --clr-surface-a10: #22242B;
+    --clr-surface-a20: #2A2C33;
+    --clr-surface-a30: #32343B;
+    --clr-surface-a40: #3A3C43;
+    --clr-surface-a50: #42444B;
   }
 
   * {

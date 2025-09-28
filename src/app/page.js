@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-
 import {
   Wallet,
   Plus,
@@ -23,6 +22,10 @@ import { SharePortfolioButton } from "@/components/portfolio/share-portfolio-but
 import { MintProjectDialog } from "@/components/dialogs/mint-project-dialog";
 import { Badge } from "@/components/ui/badge";
 import { VerificationDialog } from "@/components/dialogs/verification-dialog";
+import { CardInfo } from "@/components/layout/CardInfo";
+import { card1, card2, card3 } from "@/components/layout/CardInfo";
+import WalletAccount from "@/components/features/WalletAccount";
+
 
 export default function Home() {
   const { address, isConnected } = useAccount();
@@ -52,18 +55,23 @@ export default function Home() {
       verified: true,
     },
   ]);
+
+
+
+
+
 const handleMintSuccess = (newProject) => {
   setUserNFTs((prev) => [{ ...newProject, verified: true }, ...prev]);
 };
   return (
-    <div className="w-full min-h-screen flex flex-col justify-center items-center">
+    <div className="w-full min-h-screen flex flex-co justify-center items-center ">
       <main className="container mx-auto px-6 py-12">
         {!isConnected ? (
           <div className="max-w-4xl mx-auto text-center space-y-12">
             <div className="space-y-6">
               <h1 className="text-5xl font-bold text-balance leading-tight">
                 Showcase Your Projects as{" "}
-                <span className="text-green-700">Verifiable NFTs</span>
+                <span className="text-[#0142d9]">Verifiable NFTs</span>
               </h1>
               <p className="text-xl text-muted-foreground text-balance max-w-2xl mx-auto leading-relaxed">
                 Transform your academic and personal projects into
@@ -73,52 +81,16 @@ const handleMintSuccess = (newProject) => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-              <Card className="text-center">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Wallet className="w-6 h-6 " /></div>
-                  <CardTitle className="text-lg">Connect Wallet</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    Sign in with your crypto wallet using MetaMask or
-                    WalletConnect
-                  </CardDescription>
-                </CardContent>
-              </Card>
-
-              <Card className="text-center">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Plus className="w-6 h-6" />
-                  </div>
-                  <CardTitle className="text-lg">Mint Projects</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    Upload project details and mint them as NFTs on the
-                    blockchain
-                  </CardDescription>
-                </CardContent>
-              </Card>
-
-              <Card className="text-center">
-                <CardHeader>
-                 <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Award className="w-6 h-6" />
-                  </div> <CardTitle className="text-lg">Share Portfolio</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    Get a shareable link to your verified portfolio for
-                    employers
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              <CardInfo {...card1} />
+              <CardInfo {...card2} />
+              <CardInfo {...card3} />
             </div>
-            <Button size="lg" className="gap-2 text-lg px-8 py-6">
-              {isConnected ? address : "Connect Wallet"}
-            </Button>
+            <div className="flex justify-center items-center w-full">
+              <div className="max-w-xs w-full mx-auto flex justify-center items-center">
+                <WalletAccount />
+              </div>
+            </div>
+            
           </div>
         ) : (
           <div className="space-y-8">
