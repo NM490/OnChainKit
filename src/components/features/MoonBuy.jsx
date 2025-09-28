@@ -8,7 +8,7 @@ const MoonPayBuyWidget = dynamic(
 export default function MoonBuy() {
   return (
     <>
-      <MoonPayBuyWidget
+      <MoonPayBuyWidget 
         variant="embedded"
         baseCurrencyCode="usd"
         baseCurrencyAmount="100"

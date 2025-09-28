@@ -94,7 +94,7 @@ export function MintProjectDialog({ onMintSuccess }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2 bg-brand text-white hover:bg-brand/10 transition dark:border-1 dark:bg-brand/20 dark:text-white dark:hover:bg-brand/30 dark:border-brand/80">
           <Plus className="w-4 h-4" />
           Mint New Project
         </Button>
@@ -218,7 +218,7 @@ export function MintProjectDialog({ onMintSuccess }) {
                 Minting Process
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3">f
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>• Your project metadata will be stored on IPFS for permanent access</p>
                 <p>• An ERC-721 NFT will be minted to your connected wallet</p>

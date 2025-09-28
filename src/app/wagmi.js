@@ -16,7 +16,7 @@ export function getConfig() {
     chains: [baseSepolia],
     connectors: [
       coinbaseWallet({
-        appName: "Hello World",
+        appName: "NFT Portfolio",
         preference: "all",
         version: "4",
       }),
