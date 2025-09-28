@@ -9,7 +9,6 @@ export default function Header() {
   const navBtns = [
     { text: "Home", url: "/", id: "home-btn" },
     { text: "About", url: "/about", id: "about-btn" },
-    { text: "Contact", url: "/contact", id: "contact-btn" },
   ];
 
   const [isDark, setIsDark] = useState(() =>
