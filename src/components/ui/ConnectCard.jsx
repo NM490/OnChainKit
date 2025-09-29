@@ -10,7 +10,7 @@ import Image from "next/image";
 
 export default function ConnectCard() {
   return (
-    <div className="w-full h-screen flex items-center justify-center">
+    <div className="w-full h-full flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="rounded-lg flex items-center justify-center mx-auto mb-4">
