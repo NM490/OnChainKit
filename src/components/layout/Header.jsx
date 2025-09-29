@@ -32,7 +32,7 @@ export default function Header() {
         {/* Left - Logo */}
         <a href="/" aria-label="Home" className="flex items-center gap-3 justify-between hover:opacity-90 transition">
           <div className="flex items-center gap-3 justify-between">
-              <Image src="/favicon.ico" alt="Logo" width={50} height={50} />
+              <Image src="/favicon.ico" alt="Logo" width={65} height={65} />
             <div className="flex">
               <h1 className="flex text-lg font-semibold text-foreground">NFT Portfolio </h1>
               <p className="text-[10px] text-muted-foreground absolute translate-y-6">RAITE Project</p>

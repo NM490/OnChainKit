@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "OnChainKit - NFT Portfolio",
+  title: "MintedMe - NFT Portfolio",
   description: "RAITE Project",
 };
 

@@ -32,7 +32,7 @@ export default function Providers({ children }) {
           projectId={process.env.NEXT_PUBLIC_CDP_PROJECT_ID}
           config={{
             appearance: {
-              name: "NFT Portfolio",
+              name: "MintedMe",
               logo: "/favicon.ico",
               mode: isDark ? "dark" : "light",
               theme: "base",
