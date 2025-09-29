@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,7 @@ import {
 import { Plus, Upload, Github, FileText, X, Loader2 } from "lucide-react";
 
 export function MintProjectDialog({ onMintSuccess }) {
+  const { address } = useAccount();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -81,7 +83,23 @@ export function MintProjectDialog({ onMintSuccess }) {
       skills: formData.skills,
       mintDate: new Date().toISOString(),
       tokenId: `#${String(Date.now()).slice(-3).padStart(3, "0")}`,
+      address: address || "",
     };
+
+    // Store project in JSON file via API
+    try {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProject),
+      });
+      const result = await response.json();
+      if (!result.success) {
+        console.error("Failed to save project:", result.error);
+      }
+    } catch (err) {
+      console.error("Error saving project:", err);
+    }
 
     onMintSuccess(newProject);
     setIsLoading(false);

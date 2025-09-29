@@ -16,7 +16,7 @@ export function getConfig() {
     chains: [baseSepolia],
     connectors: [
       coinbaseWallet({
-        appName: "NFT Portfolio",
+        appName: "MintedMe",
         preference: "all",
         version: "4",
       }),

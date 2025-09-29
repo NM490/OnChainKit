@@ -6,37 +6,27 @@ import { SharePortfolioButton } from "@/components/portfolio/share-portfolio-but
 import ConnectCard from "@/components/ui/ConnectCard";
 import ProjectCard from "@/components/ui/ProjectCard";
 import ShareCard from "@/components/ui/ShareCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 
 export default function Portfolio() {
   const { address, isConnected } = useAccount();
-  const [userNFTs, setUserNFTs] = useState([
-    // {
-    //   id: 1,
-    //   title: "E-Commerce Platform",
-    //   description:
-    //     "Full-stack React application with payment integration and admin dashboard",
-    //   githubUrl: "https://github.com/student/ecommerce-app",
-    //   portfolioUrl: "https://portfolio.example.com/ecommerce",
-    //   skills: ["React", "Node.js", "MongoDB", "Stripe"],
-    //   mintDate: "2024-01-15",
-    //   tokenId: "#001",
-    //   verified: true,
-    // },
-    {
-      id: 2,
-      title: "AI Chat Application",
-      description:
-        "Real-time chat app with AI integration and modern UI design",
-      githubUrl: "https://github.com/student/ai-chat",
-      portfolioUrl: "https://portfolio.example.com/ai-chat",
-      skills: ["Next.js", "OpenAI", "WebSocket", "TailwindCSS"],
-      mintDate: "2024-02-20",
-      tokenId: "#002",
-      verified: true,
-    },
-  ]);
+  const [userNFTs, setUserNFTs] = useState([]);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      if (!address) return;
+      try {
+        const res = await fetch("/api/projects");
+        const allProjects = await res.json();
+        const filtered = allProjects.filter((p) => p.address === address);
+        setUserNFTs(filtered);
+      } catch (err) {
+        console.error("Failed to fetch projects:", err);
+      }
+    }
+    fetchProjects();
+  }, [address]);
 
   const handleMintSuccess = (newProject) => {
     setUserNFTs((prev) => [{ ...newProject, verified: true }, ...prev]);
@@ -79,3 +69,4 @@ export default function Portfolio() {
     </>
   );
 }
+
