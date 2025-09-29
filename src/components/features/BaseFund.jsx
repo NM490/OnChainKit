@@ -154,7 +154,7 @@ function FundContent({ address }) {
       <FundCardPresetAmountInputList />
       <FundCardPaymentMethodDropdown />
       <Button
-        className={`w-full`}
+        className={`w-full font-bold bg-brand text-white hover:bg-brand/50 dark:hover:bg-brand`}
         type={`button`}
         onClick={handleOnramp}
         disabled={!fundAmountFiat}

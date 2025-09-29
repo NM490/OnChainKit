@@ -15,7 +15,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Plus, Upload, Github, FileText, X, Loader2 } from "lucide-react";
 
 export function MintProjectDialog({ onMintSuccess }) {
@@ -36,7 +42,10 @@ export function MintProjectDialog({ onMintSuccess }) {
   };
 
   const addSkill = () => {
-    if (formData.currentSkill.trim() && !formData.skills.includes(formData.currentSkill.trim())) {
+    if (
+      formData.currentSkill.trim() &&
+      !formData.skills.includes(formData.currentSkill.trim())
+    ) {
       setFormData((prev) => ({
         ...prev,
         skills: [...prev.skills, formData.currentSkill.trim()],
@@ -107,7 +116,8 @@ export function MintProjectDialog({ onMintSuccess }) {
     });
   };
 
-  const isFormValid = formData.title && formData.description && formData.githubUrl;
+  const isFormValid =
+    formData.title && formData.description && formData.githubUrl;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -121,8 +131,8 @@ export function MintProjectDialog({ onMintSuccess }) {
         <DialogHeader>
           <DialogTitle className="text-2xl">Mint New Project NFT</DialogTitle>
           <DialogDescription>
-            Create a blockchain-verified credential for your project. All information will be stored immutably on IPFS
-            and linked to your NFT.
+            Create a blockchain-verified credential for your project. All
+            information will be stored immutably on IPFS and linked to your NFT.
           </DialogDescription>
         </DialogHeader>
 
@@ -131,7 +141,9 @@ export function MintProjectDialog({ onMintSuccess }) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Project Information</CardTitle>
-              <CardDescription>Basic details about your project</CardDescription>
+              <CardDescription>
+                Basic details about your project
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -151,7 +163,9 @@ export function MintProjectDialog({ onMintSuccess }) {
                   placeholder="Describe your project, technologies used, and key features..."
                   className="min-h-[100px]"
                   value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                 />
               </div>
             </CardContent>
@@ -161,7 +175,9 @@ export function MintProjectDialog({ onMintSuccess }) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Project Links</CardTitle>
-              <CardDescription>Links to your code repository and live demo</CardDescription>
+              <CardDescription>
+                Links to your code repository and live demo
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -173,7 +189,9 @@ export function MintProjectDialog({ onMintSuccess }) {
                     placeholder="https://github.com/username/project"
                     className="pl-10"
                     value={formData.githubUrl}
-                    onChange={(e) => handleInputChange("githubUrl", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("githubUrl", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -187,7 +205,9 @@ export function MintProjectDialog({ onMintSuccess }) {
                     placeholder="https://your-project.vercel.app"
                     className="pl-10"
                     value={formData.portfolioUrl}
-                    onChange={(e) => handleInputChange("portfolioUrl", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("portfolioUrl", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -198,14 +218,18 @@ export function MintProjectDialog({ onMintSuccess }) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Skills & Technologies</CardTitle>
-              <CardDescription>Add the technologies and skills demonstrated in this project</CardDescription>
+              <CardDescription>
+                Add the technologies and skills demonstrated in this project
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Input
                   placeholder="e.g., React, Node.js, MongoDB"
                   value={formData.currentSkill}
-                  onChange={(e) => handleInputChange("currentSkill", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("currentSkill", e.target.value)
+                  }
                   onKeyPress={handleKeyPress}
                 />
                 <Button type="button" variant="outline" onClick={addSkill}>
@@ -218,7 +242,10 @@ export function MintProjectDialog({ onMintSuccess }) {
                   {formData.skills.map((skill) => (
                     <Badge key={skill} variant="secondary" className="gap-1">
                       {skill}
-                      <button onClick={() => removeSkill(skill)} className="ml-1 hover:text-destructive">
+                      <button
+                        onClick={() => removeSkill(skill)}
+                        className="ml-1 hover:text-destructive"
+                      >
                         <X className="w-3 h-3" />
                       </button>
                     </Badge>
@@ -232,15 +259,21 @@ export function MintProjectDialog({ onMintSuccess }) {
           <Card className="bg-accent/5 border-accent/20">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Upload className="w-5 h-5 text-accent" />
+                <Upload className="w-5 h-5 text-brand" />
                 Minting Process
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">f
+            <CardContent className="space-y-3">
               <div className="text-sm text-muted-foreground space-y-2">
-                <p>• Your project metadata will be stored on IPFS for permanent access</p>
+                <p>
+                  • Your project metadata will be stored on IPFS for permanent
+                  access
+                </p>
                 <p>• An ERC-721 NFT will be minted to your connected wallet</p>
-                <p>• The NFT will contain a tokenURI pointing to your project metadata</p>
+                <p>
+                  • The NFT will contain a tokenURI pointing to your project
+                  metadata
+                </p>
                 <p>• Gas fees will be required for the minting transaction</p>
               </div>
             </CardContent>
@@ -248,10 +281,18 @@ export function MintProjectDialog({ onMintSuccess }) {
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
-          <Button onClick={handleMint} disabled={!isFormValid || isLoading} className="gap-2">
+          <Button
+            onClick={handleMint}
+            disabled={!isFormValid || isLoading}
+            className="gap-2 bg-brand"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />

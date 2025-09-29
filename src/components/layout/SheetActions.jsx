@@ -1,4 +1,4 @@
-import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Avatar, Name, EthBalance } from "@coinbase/onchainkit/identity";
 
 import { Button } from "../ui/button";
@@ -44,7 +44,7 @@ export default function SheetActions() {
 
   return (
     <>
-      <SheetContent className={`flex flex-col gap-5`}>
+      <SheetContent className={`flex flex-col gap-5 `}>
         <SheetTitle className={`font-bold flex items-center gap-3`}>
           {action ? (
             <span className="text-bold text-2xl flex items-center gap-3 leading-none">
@@ -61,7 +61,6 @@ export default function SheetActions() {
           )}
         </SheetTitle>
         <Separator />
-
         {action ? (
           <ActionComponent address={address} />
         ) : (
@@ -87,12 +86,21 @@ function WalletActions({ address, changeAction }) {
 
   useEffect(() => {
     async function fetchPrice() {
-      const res = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
-      );
-      const json = await res.json();
-      setUsdPrice(json.ethereum.usd);
+      try {
+        const res = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+          { headers: { accept: "application/json" } }
+        );
+
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+        const json = await res.json();
+        setUsdPrice(json.ethereum.usd);
+      } catch (err) {
+        console.error("Failed to fetch ETH price:", err);
+      }
     }
+
     fetchPrice();
   }, []);
 
@@ -101,16 +109,16 @@ function WalletActions({ address, changeAction }) {
   return (
     <>
       <SheetHeader>
-        <h1 className="font-bold text-black flex flex-col">
-          <EthBalance address={address} className={`text-black text-3xl`} />
-          <span className="text-md text-black/80">$ {usd}</span>
+        <h1 className="font-bold dark:text-white flex flex-col px-3">
+          <EthBalance address={address} className={`text-3xl dark:text-white`} />
+          <span className="text-md text-brand">${usd}</span>
         </h1>
       </SheetHeader>
       <div className="grid grid-cols-3 gap-3">
         {actionButtons.map((action) => (
           <Button
             key={action.text + action.icon}
-            className={`flex flex-col h-fit items-start p-3 cursor-pointer`}
+            className={`flex flex-col h-fit items-start p-3 cursor-pointer bg-brand hover:bg-brand/50 dark:hover:bg-brand dark:text-white`}
             onClick={() => changeAction(action)}
           >
             <DynamicIcons iconName={action.icon} size={24} /> {action.text}
