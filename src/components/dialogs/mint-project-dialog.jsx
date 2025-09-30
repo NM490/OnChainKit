@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import axios from "axios";
+
+// wagmi / viem
+import { useAccount, useWriteContract } from "wagmi";
+import { parseAbi } from "viem";
+
+// ui components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,10 +28,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+// icons
 import { Plus, Upload, Github, FileText, X, Loader2 } from "lucide-react";
 
 export function MintProjectDialog({ onMintSuccess }) {
   const { address } = useAccount();
+  const [ipfsHash, setIpfsHash] = useState("");
+  const [fileCID, setfileCID] = useState("");
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -37,8 +47,33 @@ export function MintProjectDialog({ onMintSuccess }) {
     currentSkill: "",
   });
 
+  const CONTRACT_ADDRESS = "0x679a8A7447650AAE9138AB84afB24EcC20a59e63";
+
+  // ABI for Portfolio contract
+  const ABI = parseAbi([
+    "function safeMint(address to, string uri) public returns (uint256)",
+  ]);
+
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const { writeContract, isPending, error } = useWriteContract();
+
+  const [uri, setUri] = useState("");
+
+  const handleMint2 = async () => {
+    if (!address) return;
+    try {
+      await writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: ABI,
+        functionName: "safeMint",
+        args: [address, uri],
+      });
+    } catch (err) {
+      console.error("❌ Mint error:", err);
+    }
   };
 
   const addSkill = () => {
@@ -100,6 +135,32 @@ export function MintProjectDialog({ onMintSuccess }) {
     } catch (err) {
       console.error("Error saving project:", err);
     }
+
+    //upload
+    try {
+      const res = await axios.post("/api/upload", {
+        jsonContent: newProject,
+        previousHash: ipfsHash || null,
+      });
+
+      setfileCID(res.data.IpfsHash);
+      console.log(`ipfs://${fileCID}/${newProject.id}.json`);
+    } catch (err) {
+      console.error("Error uploading project:", err);
+    }
+
+    try {
+      await writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: ABI,
+        functionName: "safeMint",
+        args: [address, `ipfs://${fileCID}/${newProject.id}.json`],
+      });
+    } catch (err) {
+      console.error("❌ Mint error:", err);
+    }
+
+    console.log(newProject);
 
     onMintSuccess(newProject);
     setIsLoading(false);

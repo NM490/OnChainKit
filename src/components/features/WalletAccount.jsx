@@ -71,6 +71,10 @@ export default function WalletAccount({ ...props }) {
             >
               Wallet
             </WalletDropdownLink>
+            <WalletDropdownLink
+            >
+              Wallet
+            </WalletDropdownLink>
             <WalletDropdownDisconnect className="text-brand dark:text-white" />
           </WalletDropdown>
         </Wallet>
