@@ -2,8 +2,7 @@ import { Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardTitle } from "../ui/card";
 import { MintProjectDialog } from "../dialogs/mint-project-dialog";
 
-export default function MintFirstProject({handleMintSuccess}) {
-    
+export default function MintFirstProject({ refreshNFTs }) {
   return (
     <>
       <Card className="text-center py-12">
@@ -16,7 +15,7 @@ export default function MintFirstProject({handleMintSuccess}) {
             Start building your blockchain portfolio by minting your first
             project
           </CardDescription>
-          <MintProjectDialog onMintSuccess={handleMintSuccess} />
+          <MintProjectDialog refreshNFTs={refreshNFTs} />
         </CardContent>
       </Card>
     </>

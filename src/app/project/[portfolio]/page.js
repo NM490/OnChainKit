@@ -3,11 +3,13 @@
 import { MintProjectDialog } from "@/components/dialogs/mint-project-dialog";
 import MintFirstProject from "@/components/features/MintFirstProject";
 import { SharePortfolioButton } from "@/components/portfolio/share-portfolio-button";
+import { Button } from "@/components/ui/button";
 import ConnectCard from "@/components/ui/ConnectCard";
 import ProjectCard from "@/components/ui/ProjectCard";
 import ShareCard from "@/components/ui/ShareCard";
 import { addressToSlug } from "@/lib/slug-actions";
-import { useState, useEffect } from "react";
+import { RotateCw } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "wagmi";
 
 export default function Portfolio() {
@@ -15,26 +17,27 @@ export default function Portfolio() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchNFTs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/alchemy/get-project-nft?owner=${address}`);
+      const data = await res.json();
+      setProjects(data.ownedNfts || []);
+    } catch (err) {
+      console.error("Failed to fetch NFTs:", err);
+    } finally {
+      setLoading(false);
+    }
+  });
+
   useEffect(() => {
     if (!address || !isConnected) return;
-
-    async function fetchNFTs() {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `/api/alchemy/get-project-nft?owner=${address}`
-        );
-        const data = await res.json();
-        setProjects(data.ownedNfts || []);
-      } catch (err) {
-        console.error("Failed to fetch NFTs:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchNFTs();
   }, [address, isConnected]);
+
+  const refreshNFTs = async () => {
+    await fetchNFTs();
+  };
 
   const url = address
     ? `http://localhost:3000/browse/project/${addressToSlug(address)}`
@@ -55,8 +58,9 @@ export default function Portfolio() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
+                <Button onClick={refreshNFTs} variant={"outline"}><RotateCw /></Button>
                 <SharePortfolioButton url={url} variant="outline" />
-                <MintProjectDialog />
+                <MintProjectDialog refreshNFTs={refreshNFTs} />
               </div>
             </div>
 
@@ -77,7 +81,9 @@ export default function Portfolio() {
               </div>
             )}
 
-            {projects.length === 0 && !loading && <MintFirstProject />}
+            {projects.length === 0 && !loading && (
+              <MintFirstProject refreshNFTs={refreshNFTs} />
+            )}
           </div>
         </main>
       </div>

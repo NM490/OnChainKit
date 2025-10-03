@@ -39,7 +39,7 @@ const ABI = [
   },
 ];
 
-export function MintProjectDialog() {
+export function MintProjectDialog({refreshNFTs}) {
   const { address } = useAccount();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -152,6 +152,8 @@ export function MintProjectDialog() {
       toast("NFT Minted!", {
         description: "Your project NFT has been successfully minted.",
       });
+
+      refreshNFTs();
 
       setIsLoading(false);
       setOpen(false);
