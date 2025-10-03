@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Share2, Copy, Check } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CopyButton } from "../ui/CopyButton";
 
 export function SharePortfolioButton({ url, variant = "default" }) {
   const [copied, setCopied] = useState(false);
@@ -43,9 +49,8 @@ export function SharePortfolioButton({ url, variant = "default" }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={copyToClipboard} className="gap-2">
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          {copied ? "Copied!" : "Copy Link"}
+        <DropdownMenuItem onClick={copyToClipboard} className="p-0">
+          <CopyButton value={url} className={`w-full h-full text-md font-normal justify-start p-2`} variant={`ghost`}>Copy Link</CopyButton>
         </DropdownMenuItem>
         {navigator.share && (
           <DropdownMenuItem onClick={shareViaWebShare} className="gap-2">

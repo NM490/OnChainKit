@@ -1,9 +1,16 @@
 import { Share2 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./card";
 import { Button } from "./button";
 import { SharePortfolioButton } from "../portfolio/share-portfolio-button";
+import { addressToSlug } from "@/lib/slug-actions";
 
-export default function ShareCard() {
+export default function ShareCard({ url }) {
   return (
     <>
       <Card className="bg-gradient-to-r from-accent/5 to-primary/5 border-accent/20">
@@ -18,17 +25,21 @@ export default function ShareCard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg border">
-            <code className="text-sm text-muted-foreground font-mono">
-              /portfolio/...
+          <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg border ">
+            <code className={`text-sm text-muted-foreground font-mono ${!url && "animate-pulse"}`}>
+              {url ? url : "Loading..."}
             </code>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" asChild>
-                <a href="" target="_blank" rel="noopener noreferrer">
+                <a
+                  href={`/browse/project/${url}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Preview
                 </a>
               </Button>
-              <SharePortfolioButton url="" variant="outline" />
+              <SharePortfolioButton url={url} variant="outline" />
             </div>
           </div>
         </CardContent>

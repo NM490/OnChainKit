@@ -19,14 +19,14 @@ export function CopyButton({
       await navigator.clipboard.writeText(value);
       setCopied(true);
       toast("Copied!", {
-        description: "Address copied to clipboard."
+        description: "Address copied to clipboard.",
       });
 
       // Reset the copied state after 2 seconds
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast("Failed", {
-        description: "Could not copy to clipboard."
+        description: "Could not copy to clipboard.",
       });
     }
   };
@@ -39,7 +39,7 @@ export function CopyButton({
       className={className}
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      {children && <span className="ml-2">{children}</span>}
+      {children && <span className="">{children}</span>}
     </Button>
   );
 }

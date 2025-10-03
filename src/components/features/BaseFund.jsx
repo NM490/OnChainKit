@@ -67,8 +67,6 @@ function FundContent({ address }) {
     presetAmountInputs,
   } = useFundContext();
 
-  console.log(asset);
-
   // Generate session token
   const generateSessionToken = async () => {
     try {

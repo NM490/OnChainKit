@@ -22,8 +22,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Plus, Upload, Github, FileText, X, Loader2 } from "lucide-react";
+import { useWriteContract, useAccount } from "wagmi";
+import { parseEther } from "viem";
+import { toast } from "sonner";
+import { normalizeUrl } from "@/utils/input-actions";
 
-export function MintProjectDialog({ onMintSuccess }) {
+const CONTRACT_ADDRESS = "0xEf6bd98C0306BA33C5Caf85B46E55700A02Ad977";
+
+const ABI = [
+  {
+    inputs: [{ internalType: "string[]", name: "uris", type: "string[]" }],
+    name: "safeMint",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+];
+
+export function MintProjectDialog() {
+  const { address } = useAccount();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,9 +51,65 @@ export function MintProjectDialog({ onMintSuccess }) {
     skills: [],
     currentSkill: "",
   });
+  const [errors, setErrors] = useState({
+    title: "",
+    description: "",
+    githubUrl: "",
+    portfolioUrl: "",
+  });
+  const { writeContractAsync } = useWriteContract();
+
+  const validateField = (field, value) => {
+    let message = "";
+
+    if (field === "title" && !value.trim()) {
+      message = "Project title is required.";
+    }
+
+    if (field === "description" && !value.trim()) {
+      message = "Project description is required.";
+    }
+
+    if (field === "githubUrl") {
+      if (!value.trim()) {
+        message = "GitHub repository URL is required.";
+      } else if (!/^https?:\/\/(github\.com)\/.+/.test(value.trim())) {
+        message = "Enter a valid GitHub URL.";
+      }
+    }
+
+    if (field === "portfolioUrl" && value.trim()) {
+      if (!/^https?:\/\/[^\s$.?#].[^\s]*$/.test(value.trim())) {
+        message = "Enter a valid URL for the live demo.";
+      }
+    }
+
+    setErrors((prev) => ({ ...prev, [field]: message }));
+  };
 
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    // current value in state (previous before this change)
+    const prevValue = formData[field] ?? "";
+
+    // normalize whitespace
+    let newValue = value;
+
+    // Only auto-prepend when the user is *starting* to type into an empty field.
+    // This prevents re-adding https:// on every keystroke/backspace.
+    if (
+      (field === "portfolioUrl" || field === "githubUrl") &&
+      prevValue.trim() === "" && // user started from empty field
+      newValue.trim().length > 0 && // there's something typed/pasted
+      !/^http/i.test(newValue) // doesn't already start with http or https
+    ) {
+      newValue = `https://${newValue.trim()}`;
+    }
+
+    // Update state
+    setFormData((prev) => ({ ...prev, [field]: newValue }));
+
+    // Live-validate
+    validateField(field, newValue);
   };
 
   const addSkill = () => {
@@ -66,40 +139,123 @@ export function MintProjectDialog({ onMintSuccess }) {
     }
   };
 
-  const handleMint = async () => {
+  async function mintProject(ipfsHash) {
+    try {
+      await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: ABI,
+        functionName: "safeMint",
+        args: [[`ipfs://${ipfsHash}`]],
+        value: parseEther("0.0004"),
+      });
+
+      toast("NFT Minted!", {
+        description: "Your project NFT has been successfully minted.",
+      });
+
+      setIsLoading(false);
+      setOpen(false);
+      setFormData({
+        title: "",
+        description: "",
+        githubUrl: "",
+        portfolioUrl: "",
+        skills: [],
+        currentSkill: "",
+      });
+    } catch (err) {
+      toast("Minting failed", {
+        description:
+          "Transaction failed. Metadata will be cleaned up. Try again.",
+        variant: "destructive",
+      });
+
+      try {
+        await fetch("/api/pinata/delete-metadata", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cid: ipfsHash }),
+        });
+      } catch (cleanupErr) {
+        console.error("Cleanup failed:", cleanupErr);
+      }
+      setIsLoading(false);
+    }
+  }
+
+  async function waitForPinataMetadata(cid, maxRetries = 20, delay = 3000) {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const res = await fetch("/api/pinata/check-metadata", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cid }),
+        });
+        const data = await res.json();
+        if (data.success) return true;
+      } catch (err) {
+        console.error("Error checking Pinata metadata:", err);
+      }
+      await new Promise((r) => setTimeout(r, delay)); // wait before retry
+    }
+    return false; // failed after maxRetries
+  }
+
+  async function handleMint() {
     setIsLoading(true);
 
-    // Simulate minting process
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    if (errors.title || errors.description || errors.githubUrl) {
+      toast("Invalid Form", {
+        description: "Please fix the errors before minting.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
 
-    const newProject = {
-      id: Date.now(),
-      title: formData.title,
-      description: formData.description,
-      githubUrl: formData.githubUrl,
-      portfolioUrl: formData.portfolioUrl,
-      skills: formData.skills,
-      mintDate: new Date().toISOString(),
-      tokenId: `#${String(Date.now()).slice(-3).padStart(3, "0")}`,
-    };
+    try {
+      // 1️⃣ Upload metadata
+      const res = await fetch("/api/pinata/upload-metadata", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address,
+          title: formData.title,
+          description: formData.description,
+          github: formData.githubUrl,
+          liveDemo: formData.portfolioUrl,
+          skills: formData.skills,
+        }),
+      });
 
-    onMintSuccess(newProject);
-    setIsLoading(false);
-    setOpen(false);
+      const data = await res.json();
+      if (!data.success) throw new Error("Pinata upload failed");
 
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      githubUrl: "",
-      portfolioUrl: "",
-      skills: [],
-      currentSkill: "",
-    });
-  };
+      const { ipfsHash } = data;
 
-  const isFormValid =
-    formData.title && formData.description && formData.githubUrl;
+      toast("Metadata uploaded", {
+        description: "Waiting for IPFS to propagate...",
+      });
+
+      const isPinned = await waitForPinataMetadata(ipfsHash);
+      if (!isPinned) throw new Error("Metadata not fully pinned on Pinata");
+
+      toast("Metadata confirmed", {
+        description: "Minting your NFT now...",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+
+      await mintProject(ipfsHash);
+    } catch (err) {
+      toast("Minting failed", {
+        description:
+          "Metadata may not be uploaded or accessible. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -128,17 +284,24 @@ export function MintProjectDialog({ onMintSuccess }) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-2 relative pb-4">
                 <Label htmlFor="title">Project Title *</Label>
                 <Input
                   id="title"
                   placeholder="e.g., E-Commerce Platform"
                   value={formData.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
+                  onBlur={(e) => validateField("title", e.target.value)}
                 />
+                <p
+                  className={`text-red-500 text-xs absolute bottom-0 left-0 ${
+                    errors.title ? "" : "invisible"
+                  }`}
+                >
+                  {errors.title}
+                </p>
               </div>
-
-              <div className="space-y-2">
+              <div className="space-y-2 relative pb-4">
                 <Label htmlFor="description">Description *</Label>
                 <Textarea
                   id="description"
@@ -148,7 +311,15 @@ export function MintProjectDialog({ onMintSuccess }) {
                   onChange={(e) =>
                     handleInputChange("description", e.target.value)
                   }
+                  onBlur={(e) => validateField("description", e.target.value)}
                 />
+                <p
+                  className={`text-red-500 text-xs absolute bottom-0 left-0 ${
+                    errors.description ? "" : "invisible"
+                  }`}
+                >
+                  {errors.description}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -162,7 +333,7 @@ export function MintProjectDialog({ onMintSuccess }) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-2 relative pb-4">
                 <Label htmlFor="github">GitHub Repository *</Label>
                 <div className="relative">
                   <Github className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -174,11 +345,19 @@ export function MintProjectDialog({ onMintSuccess }) {
                     onChange={(e) =>
                       handleInputChange("githubUrl", e.target.value)
                     }
+                    onBlur={(e) => validateField("githubUrl", e.target.value)}
                   />
                 </div>
+                <p
+                  className={`text-red-500 text-xs absolute bottom-0 left-0 ${
+                    errors.githubUrl ? "" : "invisible"
+                  }`}
+                >
+                  {errors.githubUrl}
+                </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 relative pb-4">
                 <Label htmlFor="portfolio">Live Demo / Portfolio Link</Label>
                 <div className="relative">
                   <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -190,8 +369,18 @@ export function MintProjectDialog({ onMintSuccess }) {
                     onChange={(e) =>
                       handleInputChange("portfolioUrl", e.target.value)
                     }
+                    onBlur={(e) =>
+                      validateField("portfolioUrl", e.target.value)
+                    }
                   />
                 </div>
+                <p
+                  className={`text-red-500 text-xs absolute bottom-0 left-0 ${
+                    errors.portfolioUrl ? "" : "invisible"
+                  }`}
+                >
+                  {errors.portfolioUrl}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -272,8 +461,7 @@ export function MintProjectDialog({ onMintSuccess }) {
           </Button>
           <Button
             onClick={handleMint}
-            disabled={!isFormValid || isLoading}
-            className="gap-2 bg-brand"
+            className="gap-2 bg-brand hover:bg-brand/50 dark:hover:bg-brand"
           >
             {isLoading ? (
               <>

@@ -10,6 +10,7 @@ export default function Header() {
   const navBtns = [
     { text: "Home", url: "/", id: "home-nav" },
     { text: "My Portfolio", url: "/project", id: "project-nav" },
+    { text: "Browse Portfolios", url: "/browse/project", id: "browse-project-nav" },
     { text: "About", url: "/about", id: "about-nav" },
   ];
 

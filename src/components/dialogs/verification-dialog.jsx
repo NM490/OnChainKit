@@ -11,41 +11,46 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, Shield, CheckCircle, Clock, Copy, Check } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ExternalLink,
+  Shield,
+  CheckCircle,
+  Clock,
+  Copy,
+  Check,
+} from "lucide-react";
+import { CopyButton } from "../ui/CopyButton";
 
 export function VerificationDialog({ project, walletAddress }) {
-  const [copied, setCopied] = useState(false);
+  const etherscanUrl = `https://sepolia.basescan.org/tx/${project?.transactionHash}`;
+  const ipfsUrl = project?.raw.tokenUri.replace(
+    "ipfs://",
+    "https://amethyst-selective-lemming-575.mypinata.cloud/ipfs/"
+  );
 
-  // Mock blockchain data - in production this would come from actual blockchain queries
-  const blockchainData = {
-    contractAddress: "0x1234567890123456789012345678901234567890",
-    tokenId: project.tokenId.replace("#", ""),
-    transactionHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-    blockNumber: "18,542,123",
-    gasUsed: "84,532",
-    mintTimestamp: new Date(project.mintDate).toISOString(),
-    ipfsHash: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
-    network: "Ethereum Mainnet",
-  };
-
-  const etherscanUrl = `https://etherscan.io/tx/${blockchainData.transactionHash}`;
-  const ipfsUrl = `https://ipfs.io/ipfs/${blockchainData.ipfsHash}`;
-
-  const copyToClipboard = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy: ", err);
-    }
-  };
+  const blockNumber = project?.blockNumber
+    ? parseInt(project?.blockNumber, 16).toLocaleString()
+    : "N/A";
+  const gasUsed = project?.gasUsed
+    ? parseInt(project?.gasUsed, 16).toLocaleString()
+    : "N/A";
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+        <Button
+          disabled={project ? false : true}
+          variant="outline"
+          size="sm"
+          className="gap-2 bg-transparent"
+        >
           <Shield className="w-4 h-4" />
           Verify on Blockchain
         </Button>
@@ -57,7 +62,8 @@ export function VerificationDialog({ project, walletAddress }) {
             Blockchain Verification
           </DialogTitle>
           <DialogDescription>
-            Independent verification of NFT authenticity and ownership on the Ethereum blockchain
+            Independent verification of NFT authenticity and ownership on the
+            Ethereum blockchain
           </DialogDescription>
         </DialogHeader>
 
@@ -72,7 +78,10 @@ export function VerificationDialog({ project, walletAddress }) {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-3">
-                <Badge variant="default" className="gap-1 bg-accent text-green-700-foreground">
+                <Badge
+                  variant="default"
+                  className="gap-1 bg-accent text-green-700-foreground"
+                >
                   <CheckCircle className="w-3 h-3" />
                   Verified
                 </Badge>
@@ -87,35 +96,44 @@ export function VerificationDialog({ project, walletAddress }) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">NFT Information</CardTitle>
-              <CardDescription>Basic details about this NFT token</CardDescription>
+              <CardDescription>
+                Basic details about this NFT token
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Project Title</div>
-                  <div className="font-medium">{project.title}</div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Project Title
+                  </div>
+                  <div className="font-medium">{project?.name}</div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Token ID</div>
-                  <div className="font-mono">{project.tokenId}</div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Token ID
+                  </div>
+                  <div className="font-mono">{project?.tokenId}</div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Owner Address</div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Owner Address
+                  </div>
                   <div className="font-mono text-sm flex items-center gap-2">
-                    {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                    <Button
-                      variant="ghost"
+                    <CopyButton
+                      variant={"ghost"}
                       size="sm"
-                      className="h-6 w-6 p-0"
-                      onClick={() => copyToClipboard(walletAddress)}
+                      className="p-0 hover:bg-transparent"
+                      value={walletAddress}
                     >
-                      {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    </Button>
+                      {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
+                    </CopyButton>
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Network</div>
-                  <div>{blockchainData.network}</div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Network
+                  </div>
+                  <div>Base Sepolia</div>
                 </div>
               </div>
             </CardContent>
@@ -125,7 +143,9 @@ export function VerificationDialog({ project, walletAddress }) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Blockchain Transaction</CardTitle>
-              <CardDescription>On-chain transaction details for this NFT mint</CardDescription>
+              <CardDescription>
+                On-chain transaction details for this NFT mint
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-3">
@@ -133,11 +153,16 @@ export function VerificationDialog({ project, walletAddress }) {
                   <div>
                     <div className="text-sm font-medium">Transaction Hash</div>
                     <div className="font-mono text-xs text-muted-foreground">
-                      {blockchainData.transactionHash.slice(0, 10)}...{blockchainData.transactionHash.slice(-8)}
+                      {project?.transactionHash.slice(0, 10)}...
+                      {project?.transactionHash.slice(-8)}
                     </div>
                   </div>
                   <Button variant="outline" size="sm" asChild>
-                    <a href={etherscanUrl} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={etherscanUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       View on Etherscan
                     </a>
@@ -146,27 +171,33 @@ export function VerificationDialog({ project, walletAddress }) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Block Number</div>
-                    <div className="font-mono">{blockchainData.blockNumber}</div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Block Number
+                    </div>
+                    <div className="font-mono">{blockNumber}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Gas Used</div>
-                    <div className="font-mono">{blockchainData.gasUsed}</div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Gas Used
+                    </div>
+                    <div className="font-mono">{gasUsed}</div>
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Contract Address</div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    Contract Address
+                  </div>
                   <div className="font-mono text-sm flex items-center gap-2">
-                    {blockchainData.contractAddress.slice(0, 10)}...{blockchainData.contractAddress.slice(-8)}
-                    <Button
-                      variant="ghost"
+                    <CopyButton
+                      variant={"ghost"}
                       size="sm"
-                      className="h-6 w-6 p-0"
-                      onClick={() => copyToClipboard(blockchainData.contractAddress)}
+                      className="p-0 hover:bg-transparent"
+                      value={project?.contract.address}
                     >
-                      {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    </Button>
+                      {project?.contract.address.slice(0, 10)}...
+                      {project?.contract.address.slice(-8)}
+                    </CopyButton>
                   </div>
                 </div>
               </div>
@@ -177,14 +208,18 @@ export function VerificationDialog({ project, walletAddress }) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Decentralized Storage</CardTitle>
-              <CardDescription>Project metadata stored on IPFS for permanent access</CardDescription>
+              <CardDescription>
+                Project metadata stored on IPFS for permanent access
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div>
                   <div className="text-sm font-medium">IPFS Hash</div>
                   <div className="font-mono text-xs text-muted-foreground">
-                    {blockchainData.ipfsHash.slice(0, 10)}...{blockchainData.ipfsHash.slice(-8)}
+                    {project?.raw.tokenUri.replace("ipfs://", "").slice(0, 10)}
+                    ...
+                    {project?.raw.tokenUri.replace("ipfs://", "").slice(-8)}
                   </div>
                 </div>
                 <Button variant="outline" size="sm" asChild>
@@ -200,8 +235,12 @@ export function VerificationDialog({ project, walletAddress }) {
           {/* Verification Steps */}
           <Card className="bg-primary/5 border-primary/20">
             <CardHeader>
-              <CardTitle className="text-lg">How to Verify Independently</CardTitle>
-              <CardDescription>Steps for employers and educators to verify this NFT</CardDescription>
+              <CardTitle className="text-lg">
+                How to Verify Independently
+              </CardTitle>
+              <CardDescription>
+                Steps for employers and educators to verify this NFT
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3 text-sm">
@@ -212,7 +251,8 @@ export function VerificationDialog({ project, walletAddress }) {
                   <div>
                     <div className="font-medium">Check Etherscan</div>
                     <div className="text-muted-foreground">
-                      Click "View on Etherscan" to see the transaction on the blockchain explorer
+                      Click "View on Etherscan" to see the transaction on the
+                      blockchain explorer
                     </div>
                   </div>
                 </div>
@@ -223,7 +263,8 @@ export function VerificationDialog({ project, walletAddress }) {
                   <div>
                     <div className="font-medium">Verify Ownership</div>
                     <div className="text-muted-foreground">
-                      Confirm the NFT is owned by the wallet address shown in this portfolio
+                      Confirm the NFT is owned by the wallet address shown in
+                      this portfolio
                     </div>
                   </div>
                 </div>
@@ -234,7 +275,8 @@ export function VerificationDialog({ project, walletAddress }) {
                   <div>
                     <div className="font-medium">Check Metadata</div>
                     <div className="text-muted-foreground">
-                      View the IPFS metadata to see the original project details and links
+                      View the IPFS metadata to see the original project details
+                      and links
                     </div>
                   </div>
                 </div>
@@ -245,8 +287,8 @@ export function VerificationDialog({ project, walletAddress }) {
           {/* Timestamp */}
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-4 border-t">
             <Clock className="w-4 h-4" />
-            Minted on {new Date(project.mintDate).toLocaleDateString()} at{" "}
-            {new Date(project.mintDate).toLocaleTimeString()}
+            Minted on {new Date(project?.mintedAt).toLocaleDateString()} at{" "}
+            {new Date(project?.mintedAt).toLocaleTimeString()}
           </div>
         </div>
       </DialogContent>
